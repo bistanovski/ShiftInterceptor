@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateUserDevicesRegistrarTable extends Migration
+class CreateUserDeviceRegistrationsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateUserDevicesRegistrarTable extends Migration
      */
     public function up()
     {
-        Schema::create('UserDevicesRegistrar', function (Blueprint $table) {
+        Schema::create('UserDeviceRegistrations', function (Blueprint $table) {
             $table->char('registration_id', 40);
             $table->string('username', 255);
             $table->char('device_id', 40);
@@ -38,6 +38,6 @@ class CreateUserDevicesRegistrarTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('UserDevicesRegistrar');
+        Schema::dropIfExists('UserDeviceRegistrations');
     }
 }
