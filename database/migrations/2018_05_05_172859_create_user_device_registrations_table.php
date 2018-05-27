@@ -15,19 +15,21 @@ class CreateUserDeviceRegistrationsTable extends Migration
     {
         Schema::create('UserDeviceRegistrations', function (Blueprint $table) {
             $table->char('registration_id', 40);
-            $table->string('username', 255);
+            $table->bigInteger('user_id')->unsigned();
             $table->char('device_id', 40);
             $table->timestamps(); //created_at and updated_at columns
 
             $table->primary('registration_id');
 
-            $table->foreign('username')->references('username')->on('Users')
-                    ->onDelete('CASCADE')
-                    ->onUpdate('CASCADE');
-
             $table->foreign('device_id')->references('device_id')->on('Devices')
                     ->onDelete('CASCADE')
                     ->onUpdate('CASCADE');        
+        });
+
+        Schema::table('UserDeviceRegistrations', function($table) {
+            $table->foreign('user_id')->references('id')->on('Users')
+                    ->onDelete('CASCADE')
+                    ->onUpdate('CASCADE');
         });
     }
 

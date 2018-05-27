@@ -1,24 +1,24 @@
 <?php
 
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\{WithFaker, WithoutMiddleware, DatabaseTransactions};
+use Illuminate\Foundation\Testing\{WithFaker, WithoutMiddleware};
 
-class DeleteUserTest extends TestCase
+class DeleteDBUserTest extends TestCase
 {
-    use DatabaseTransactions;
+    // use DatabaseTransactions;
 
     /**
      * User deletion test
      *
      * @return void
      */
-    public function testUserDeletion()
+    public function testDelete()
     {
         dump(__METHOD__);
 
         $user = factory(App\Models\User::class)->make([
-            'username' => 'unit_test-Username',
-            'email' => 'unit_test@shiftray.com'
+            'username' => 'unit_delete-Username',
+            'email' => 'unit_delete@shiftray.com'
         ]);
 
         $user->save();

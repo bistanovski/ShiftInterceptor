@@ -71,14 +71,4 @@ class Sensor extends Model
     {
         return $this->belongsTo('App\Models\Device', 'device_id', 'device_id');
     }
-
-    /**
-     * Returns number of sensor readings
-     * 
-     * @return integer
-     */
-    public function getNumOfReadings()
-    {
-        return $this->number_of_readings;
-    }
 }

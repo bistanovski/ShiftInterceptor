@@ -15,13 +15,15 @@ class CreateSensorReadingsTable extends Migration
     {
         Schema::create('SensorReadings', function (Blueprint $table) {
             $table->increments('reading_id');
-            $table->string('sensor_name', 255);
+            $table->bigInteger('sensor_id')->unsigned();
             $table->string('reading_name', 255);
             $table->string('reading_type', 255);
-            $table->string('rendering_type', 255);
+            $table->string('rendering_type', 255)->nullable();
             $table->timestamps(); //created_at and updated_at columns
+        });
 
-            $table->foreign('sensor_name')->references('sensor_name')->on('Sensors')
+        Schema::table('SensorReadings', function($table) {
+            $table->foreign('sensor_id')->references('id')->on('Sensors')
                     ->onDelete('CASCADE')
                     ->onUpdate('CASCADE');
         });

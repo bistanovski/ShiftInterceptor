@@ -79,7 +79,7 @@ class UserDeviceRegistration extends Model
      */
     public function user()
     {
-        return $this->belongsTo('App\Models\User', 'username', 'username');
+        return $this->belongsTo('App\Models\User', 'user_id', 'id');
     }
 
     /**

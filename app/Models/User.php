@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use Hash;
+use Laravel\Passport\HasApiTokens;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class User extends Authenticatable
+class User extends Authenticatable implements JWTSubject
 {
-    use Notifiable;
+    use HasApiTokens, Notifiable;
 
     /**
      * Name of the model table
@@ -16,26 +19,6 @@ class User extends Authenticatable
      */
     protected $table = 'Users';
 
-    /**
-     * Primary key
-     * 
-     * @var string
-     */
-    protected $primaryKey = 'username';
-
-    /**
-     * Primary key type
-     * 
-     * @var string
-     */
-    protected $keyType = 'string';
-
-    /**
-     * Define whether primary key is auto incremented
-     * 
-     * @var boolean
-     */
-    public $incrementing = false;
 
     /**
      * The attributes that are mass assignable.
@@ -43,8 +26,9 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'username', 'email', 'first_name', 'last_name',
+        'username', 'email', 'first_name', 'last_name'
     ];
+
 
     /**
      * The attributes that should be hidden for arrays.
@@ -54,6 +38,73 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
     ];
+
+
+    /**
+     * @param string 
+     * @param string 
+     * @param string 
+     * @return App\Models\User
+     */
+    public static function withData(string $userName, string $email, string $password)
+    {
+        $instance = new self();
+        $instance->username = $userName;
+        $instance->email = $email;
+        $instance->password = Hash::make($password);
+
+        return $instance;
+    }
+
+
+    /**
+     * @param string 
+     * @param string 
+     * @param string 
+     * @return mixed
+     */
+    public static function createAndSave(string $userName, string $email, string $password)
+    {
+        $newUser = User::withData($userName, $email, $password);
+
+        try {
+            if(!User::existsWithEmail($email) && !User::existsWithUserName($userName))
+            {
+                $newUser->save();
+                return true;
+            }
+            else
+            {
+                return 'User already exists!';
+            }
+        }
+        catch(PDOException $e)
+        {
+            return $e->getMessage();
+        }
+    }
+
+
+    /**
+     * Get the identifier that will be stored in the subject claim of the JWT.
+     *
+     * @return mixed
+     */
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    
+    /**
+     * Return a key value array, containing any custom claims to be added to the JWT.
+     *
+     * @return array
+     */
+    public function getJWTCustomClaims()
+    {
+        return [];
+    }
 
 
     /**
@@ -74,6 +125,16 @@ class User extends Authenticatable
     public function getEmail()
     {
         return $this->email;
+    }
+
+    /**
+     * Returns User's password
+     * 
+     * @return string
+     */
+    public function getPassword()
+    {
+        return $this->password;
     }
 
     /**
@@ -114,5 +175,49 @@ class User extends Authenticatable
     public function settings()
     {
         return $this->hasMany('App\Models\Settings', 'username', 'username');
+    }
+
+    /**
+     * Returns first user by username
+     * 
+     * @param string
+     * @return App\Models\User
+     */
+    public static function firstByUserName(string $userName)
+    {
+        return User::where('username', $userName)->first();
+    }
+
+    /**
+     * Returns first user by email
+     * 
+     * @param string
+     * @return App\Models\User
+     */
+    public static function firstByEmail(string $email)
+    {
+        return User::where('email', $email)->first();
+    }
+
+    /**
+     * Checks whether User already exists
+     * 
+     * @param string
+     * @return bool
+     */
+    public static function existsWithUsername(string $userName)
+    {
+        return (null !== User::firstByUserName($userName));
+    }
+
+    /**
+     * Checks whether User already exists
+     * 
+     * @param string
+     * @return bool
+     */
+    public static function existsWithEmail(string $email)
+    {
+        return (null !== User::firstByEmail($email));
     }
 }
