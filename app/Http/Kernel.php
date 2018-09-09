@@ -30,7 +30,7 @@ class Kernel extends HttpKernel
         ],
 
         'web-api' => [
-            \App\Http\Middleware\ApiMiddleware::class,
+            // \App\Http\Middleware\ApiMiddleware::class,
             'throttle:60,1',
             'bindings',
         ],

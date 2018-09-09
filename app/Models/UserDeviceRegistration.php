@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\{User, Device};
 
 class UserDeviceRegistration extends Model
 {
@@ -70,6 +71,29 @@ class UserDeviceRegistration extends Model
     public function getDeviceID()
     {
         return $this->device_id;
+    }
+
+    /**
+     * Create UserDeviceRegistration instance based on dependent models
+     * 
+     * @param App\Models\User 
+     * @param App\Models\Device 
+     * @return boolean
+     */
+    public static function saveWithModels($userModel, $deviceModel)
+    {
+        $instance = new self();
+        $instance->registration_id = sha1($userModel->getID() . $deviceModel->getDeviceID());
+        $instance->user()->associate($userModel);
+        $instance->device()->associate($deviceModel);
+
+        try {
+            $instance->save();
+            return true;
+        }
+        catch(PDOException $e) {
+            return $e->getMessage();
+        }
     }
 
     /**

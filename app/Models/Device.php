@@ -2,7 +2,16 @@
 
 namespace App\Models;
 
+use App\Models\Sensor;
+use App\Models\SensorReading;
 use Illuminate\Database\Eloquent\Model;
+
+abstract class DeviceType 
+{
+    const DESKTOP = 'DESKTOP';
+    const MOBILE = 'MOBILE';
+    const EMBEDDED = 'EMBEDDED';
+}
 
 class Device extends Model
 {
@@ -47,7 +56,7 @@ class Device extends Model
      * 
      * @return string
      */
-    public function getID()
+    public function getDeviceID()
     {
         return $this->device_id;
     }
@@ -100,6 +109,127 @@ class Device extends Model
     public function getNumOfSensors()
     {
         return $this->number_of_sensors;
+    }
+
+    /**
+     * @param string 
+     * @param string 
+     * @param string 
+     * @param string 
+     * @param string 
+     * @param int 
+     * @return App\Models\Device
+     */
+    public static function withData(string $deviceID, string $deviceName, 
+                                    string $deviceType, string $operatingSystem, 
+                                    string $osVersion, int $numOfSensors)
+    {
+        $instance = new self();
+        $instance->device_id = $deviceID;
+        $instance->name = $deviceName;
+        $instance->type = $deviceType;
+        $instance->operating_system = $operatingSystem;
+        $instance->os_version = $osVersion;
+        $instance->number_of_sensors = $numOfSensors;
+
+        return $instance;
+    }
+
+    /**
+     * @param array 
+     * @return mixed
+     */
+    public static function createAndSave(array $params)
+    {
+        $newDevice = Device::withData($params['device_id'], $params['name'], 
+                                  $params['type'], $params['operating_system'],
+                                  $params['os_version'], $params['number_of_sensors']);
+
+        try {
+            if(!Device::existsWithDeviceID($params['device_id']))
+            {
+                $newDevice->save();
+
+                $sensorsList = $params['sensors'];
+                foreach ($sensorsList as $sensorParams) 
+                {
+                    $sensor = $newDevice->sensors()->create([
+                            'sensor_name' => $sensorParams['sensor_name'], 
+                            'number_of_readings' => $sensorParams['number_of_readings']
+                        ]);
+                    if(null !== $sensor)
+                    {
+                        $sensorReadingsList = $sensorParams['sensor_readings'];
+                        foreach($sensorReadingsList as $sensorReadingParams)
+                        {
+                            $sensorReading = $sensor->sensorReadings()->create([
+                                'reading_name' => $sensorReadingParams['reading_name'],
+                                'reading_type' => $sensorReadingParams['reading_type'],
+                                'rendering_type' => $sensorReadingParams['rendering_type']
+                            ]);
+                        }
+                    }
+                    else
+                    {
+                        return 'Registering sensor failed';
+                    }
+                }
+
+                return true;
+            }
+            else
+            {
+                return 'device_already_exists';
+            }
+        }
+        catch(PDOException $e) {
+            return $e->getMessage();
+        }
+    }
+
+    /**
+     * @param string 
+     * @return mixed
+     */
+    public static function deleteDevice(string $deviceID)
+    {
+        try {
+            $device = Device::firstByDeviceID($deviceID);
+            if(null !== $device)
+            {
+                $device->delete();
+                return true;
+            }
+            else
+            {
+                return 'device_not_found';
+            }
+        }
+        catch(PDOException $e) {
+            return $e->getMessage();
+        }
+    }
+
+    /**
+     * Checks whether Device already exists
+     * 
+     * @param string
+     * @return bool
+     */
+    public static function existsWithDeviceID(string $deviceID)
+    {
+        return (null !== Device::firstByDeviceID($deviceID));
+    }
+
+    /**
+     * Returns first Device by deviceID
+     * 
+     * @param string
+     * @return App\Models\Device
+     */
+    public static function firstByDeviceID(string $deviceID)
+    {
+        return Device::where('device_id', $deviceID)->first();
     }
 
     /**

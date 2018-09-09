@@ -75,11 +75,86 @@ class User extends Authenticatable implements JWTSubject
             }
             else
             {
-                return 'User already exists!';
+                return 'user_already_exists';
             }
         }
-        catch(PDOException $e)
-        {
+        catch(PDOException $e) {
+            return $e->getMessage();
+        }
+    }
+
+
+    /**
+     * @param string 
+     * @return mixed
+     */
+    public static function deleteUser(string $userName)
+    {
+        try {
+            $user = User::firstByUserName($userName);
+            if(null !== $user)
+            {
+                $user->delete();
+                return true;
+            }
+            else
+            {
+                return 'user_not_found';
+            }
+        }
+        catch(PDOException $e) {
+            return $e->getMessage();
+        }
+    }
+
+
+    /**
+     * @param array 
+     * @return mixed
+     */
+    public static function updateUser(array $params)
+    {
+        $userName = $params['username'];
+        $email = isset($params['email']) ? $params['email'] : '';
+        $firstName = isset($params['first_name']) ? $params['first_name'] : '';
+        $lastName = isset($params['last_name']) ? $params['last_name'] : '';
+
+        $shouldUpdateEmail = !empty($email);
+        $shouldUpdateFirstName = !empty($firstName);
+        $shouldUpdateLastName = !empty($lastName);
+
+        try {
+            if($shouldUpdateEmail)
+            {
+                $checkUser = User::firstByEmail($email);
+                if(null !== $checkUser)
+                {
+                    return 'email_already_taken';
+                }
+            }
+
+            $user = User::firstByUserName($userName);
+            if(null !== $user)
+            {
+                if($shouldUpdateEmail) {
+                    $user->email = $email;
+                }
+                if($shouldUpdateFirstName) {
+                    $user->first_name = $firstName;
+                }
+                if($shouldUpdateLastName) {
+                    $user->last_name = $lastName;
+                }
+                
+                $user->save();
+                return true;
+            }
+            else
+            {
+                return 'user_not_found';
+            }
+        }
+        catch(PDOException $e) {
             return $e->getMessage();
         }
     }
@@ -104,6 +179,17 @@ class User extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims()
     {
         return [];
+    }
+
+
+    /**
+     * Returns User's ID
+     * 
+     * @return string
+     */
+    public function getID()
+    {
+        return $this->id;
     }
 
 

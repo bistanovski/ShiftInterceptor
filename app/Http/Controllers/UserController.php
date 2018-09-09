@@ -6,17 +6,21 @@ use App\Models\User;
 use Validator, DB, Hash;
 use Illuminate\Http\Request;
 
+use App\Validations\UserValidations;
+
 class UserController extends Controller
 {
-  
+
   /**
    * Get all Users
+   * 
+   * @param Request
+   * @return \Illuminate\Http\JsonResponse
    */
   public function getUsers(Request $request)
   {
     return User::all();
   }
-
 
   /**
    * Generate personal token for User's Device
@@ -26,18 +30,12 @@ class UserController extends Controller
    */
   public function createTokenForDevice(Request $request)
   {
-    $params = $request->only('username', 'password', 'device_id');
+    $params = $request->only(UserValidations::paramsByFunction[__FUNCTION__]);
 
-    $rules = [
-      'username' => 'required|string|max:255',
-      'device_id' => 'required|string|min:40|max:40',
-      'password' => 'required|string|min:6'
-    ];
-
-    $validator = Validator::make($params, $rules);
-    
-    if($validator->fails()) {
-        return response()->webApi(['error' => $validator->messages()], 401);
+    $validateStatus = $this->_validateUserParams($params, UserValidations::rulesByFunction[__FUNCTION__]);
+    if(true !== $validateStatus)
+    {
+      return response()->webApi(['error' => $validateStatus], 401);
     }
 
     $user = User::firstByUserName($params['username']);
@@ -60,7 +58,6 @@ class UserController extends Controller
     }
   }
 
-
   /**
    * Create new User
    * 
@@ -69,21 +66,15 @@ class UserController extends Controller
    */
   public function createUser(Request $request)
   {
-    $credentials = $request->only('username', 'email', 'password');
+    $credentials = $request->only(UserValidations::paramsByFunction[__FUNCTION__]);
         
-    $rules = [
-      'username' => 'required|string|max:255|unique:Users', 
-      'email' => 'required|string|email|max:255|unique:Users',
-      'password' => 'required|string|min:6'
-    ];
-    
-    $validator = Validator::make($credentials, $rules);
-    
-    if($validator->fails()) {
-        return response()->webApi(['error' => $validator->messages()], 401);
+    $validateStatus = $this->_validateUserParams($credentials, UserValidations::rulesByFunction[__FUNCTION__]);
+    if(true !== $validateStatus)
+    {
+      return response()->webApi(['error' => $validateStatus], 401);
     }
 
-    $result = User::createAndSave($request->username, $request->email, $request->password);
+    $result = User::createAndSave($credentials['username'], $credentials['email'], $credentials['password']);
 
     if(true === $result) {
       return response()->webApi(['Successful registration!'], 201);
@@ -91,7 +82,6 @@ class UserController extends Controller
 
     return response()->webApi(['error' => $result], 401);
   }
-
 
   /**
    * Update User
@@ -101,7 +91,46 @@ class UserController extends Controller
    */
   public function updateUser(Request $request)
   {
+    $params = $request->only(UserValidations::paramsByFunction[__FUNCTION__]);
 
+    $validateStatus = $this->_validateUserParams($params, UserValidations::rulesByFunction[__FUNCTION__]);
+    if(true !== $validateStatus)
+    {
+      return response()->webApi(['error' => $validateStatus], 401);
+    }
+
+    $result = User::updateUser($params);
+
+    if(true === $result) {
+      return response()->webApi(['Successful update!'], 201);
+    }
+
+    return response()->webApi(['error' => $result], 401);
+  }
+
+  /**
+   * Delete User
+   * 
+   * @param Request
+   * @return \Illuminate\Http\JsonResponse
+   */
+  public function deleteUser(Request $request)
+  {
+    $params = $request->only(UserValidations::paramsByFunction[__FUNCTION__]);
+
+    $validateStatus = $this->_validateUserParams($params, UserValidations::rulesByFunction[__FUNCTION__]);
+    if(true !== $validateStatus)
+    {
+      return response()->webApi(['error' => $validateStatus], 401);
+    }
+
+    $result = User::deleteUser($params['username']);
+
+    if(true === $result) {
+      return response()->webApi(['Successful deletion!'], 201);
+    }
+
+    return response()->webApi(['error' => $result], 401);
   }
 
 }

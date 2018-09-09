@@ -15,12 +15,37 @@ use Illuminate\Http\Request;
 
 Route::group(['prefix' => 'v1'], function () {
     
+    //Users related API endpoints
+    
     //Get all Users
     Route::get('users', 'UserController@getUsers');
 
     //Update User
     Route::post('user/update', 'UserController@updateUser');
+    
+    //Delete User
+    Route::post('user/delete', 'UserController@deleteUser');
 
     //Logout User
     Route::post('logout', 'AuthController@logout');
+
+
+    //Devices related API endpoints
+    
+    //Get all Devices
+    Route::get('devices', 'DeviceController@getDevices');
+
+    //Register Device
+    Route::post('device/register', 'DeviceController@registerDevice');
+
+    //Delete Device
+    Route::post('device/delete', 'DeviceController@deleteDevice');
+
+
+    //UserDeviceRegistrations related API endpoints
+    Route::get('registrations', 'DeviceRegistrationsController@getRegistrations');
+
+
+    //Settings related API endpoints
+    
 });
