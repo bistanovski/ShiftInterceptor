@@ -6,7 +6,7 @@ abstract class UserValidations
 {
   const paramsByFunction = [
     'createTokenForDevice' => ['username', 'password', 'device_id'],
-    'createUser' => ['username', 'email', 'password'],
+    'createUser' => ['username', 'email', 'password', 'first_name', 'last_name'],
     'updateUser' => ['username', 'email', 'first_name', 'last_name'],
     'deleteUser' => ['username']
   ];

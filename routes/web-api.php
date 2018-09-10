@@ -20,6 +20,9 @@ Route::group(['prefix' => 'v1'], function () {
     //Get all Users
     Route::get('users', 'UserController@getUsers');
 
+    //Create User
+    Route::post('user/register', 'UserController@createUser');
+
     //Update User
     Route::post('user/update', 'UserController@updateUser');
     
@@ -44,8 +47,8 @@ Route::group(['prefix' => 'v1'], function () {
 
     //UserDeviceRegistrations related API endpoints
     Route::get('registrations', 'DeviceRegistrationsController@getRegistrations');
-
-
-    //Settings related API endpoints
     
+    
+    //Settings related API endpoints
+    Route::get('settings', 'SettingsController@getSettings');
 });

@@ -66,15 +66,17 @@ class UserController extends Controller
    */
   public function createUser(Request $request)
   {
-    $credentials = $request->only(UserValidations::paramsByFunction[__FUNCTION__]);
+    $params = $request->only(UserValidations::paramsByFunction[__FUNCTION__]);
         
-    $validateStatus = $this->_validateUserParams($credentials, UserValidations::rulesByFunction[__FUNCTION__]);
+    $validateStatus = $this->_validateUserParams($params, UserValidations::rulesByFunction[__FUNCTION__]);
     if(true !== $validateStatus)
     {
       return response()->webApi(['error' => $validateStatus], 401);
     }
 
-    $result = User::createAndSave($credentials['username'], $credentials['email'], $credentials['password']);
+    $result = User::createAndSave($params['username'], $params['email'], $params['password'], 
+                                  isset($params['first_name']) ? $params['first_name'] : null, 
+                                  isset($params['last_name']) ? $params['last_name'] : null);
 
     if(true === $result) {
       return response()->webApi(['Successful registration!'], 201);

@@ -44,14 +44,18 @@ class User extends Authenticatable implements JWTSubject
      * @param string 
      * @param string 
      * @param string 
+     * @param mixed 
+     * @param mixed 
      * @return App\Models\User
      */
-    public static function withData(string $userName, string $email, string $password)
+    public static function withData(string $userName, string $email, string $password, $firstName, $lastName)
     {
         $instance = new self();
         $instance->username = $userName;
         $instance->email = $email;
         $instance->password = Hash::make($password);
+        $instance->first_name = $firstName;
+        $instance->last_name = $lastName;
 
         return $instance;
     }
@@ -61,11 +65,13 @@ class User extends Authenticatable implements JWTSubject
      * @param string 
      * @param string 
      * @param string 
+     * @param mixed 
+     * @param mixed 
      * @return mixed
      */
-    public static function createAndSave(string $userName, string $email, string $password)
+    public static function createAndSave(string $userName, string $email, string $password, $firstName, $lastName)
     {
-        $newUser = User::withData($userName, $email, $password);
+        $newUser = User::withData($userName, $email, $password, $firstName, $lastName);
 
         try {
             if(!User::existsWithEmail($email) && !User::existsWithUserName($userName))

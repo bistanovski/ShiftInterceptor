@@ -19,9 +19,6 @@ Route::get('/', function () {
 //Login User
 Route::post('login', 'AuthController@login');
 
-//Create User
-Route::post('register', 'UserController@createUser');
-
 //Ping server
 Route::get('ping', function () { return response()->webApi(null); });
 
