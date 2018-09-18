@@ -49,6 +49,38 @@ Route::group(['prefix' => 'v1'], function () {
     Route::get('registrations', 'DeviceRegistrationsController@getRegistrations');
     
     
+    //RabbitMQ related API endpoints
+    //Get overview status of RabbitMQ
+    Route::get('rabbitmq/status', 'RabbitMQController@getStatus');
+
+    //Get RabbitMQ exchanges info
+    Route::get('rabbitmq/exchanges', 'RabbitMQController@getExchanges');
+    
+    //Create new RabbitMQ exchange for current Vhost (configured in environment file)
+    Route::post('rabbitmq/exchange/create', 'RabbitMQController@createExchange');
+
+    //Delete existing RabbitMQ exchange for current Vhost (configured in environment file)
+    Route::post('rabbitmq/exchange/delete', 'RabbitMQController@deleteExchange');
+    
+    //Get RabbitMQ bindings for current Vhost (configured in environment file)
+    Route::get('rabbitmq/bindings', 'RabbitMQController@getBindings');
+    
+    //Create new RabbitMQ binding for current Vhost (configured in environment file)
+    Route::post('rabbitmq/binding/create', 'RabbitMQController@createBinding');
+    
+    //Get RabbitMQ queues for current Vhost (configured in environment file)
+    Route::get('rabbitmq/queues', 'RabbitMQController@getQueues');
+
+    //Create new RabbitMQ queue for current Vhost (configured in environment file)
+    Route::post('rabbitmq/queue/create', 'RabbitMQController@createQueue');
+
+    //Delete existing RabbitMQ queue for current Vhost (configured in environment file)
+    Route::post('rabbitmq/queue/delete', 'RabbitMQController@deleteQueue');
+    
+    //Clear content of the provided queue
+    Route::post('rabbitmq/queue/clear-content', 'RabbitMQController@clearContent');
+
+    
     //Settings related API endpoints
     Route::get('settings', 'SettingsController@getSettings');
 });
