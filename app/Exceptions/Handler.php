@@ -3,7 +3,13 @@
 namespace App\Exceptions;
 
 use Exception;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
+
+use Tymon\JWTAuth\Exceptions\{JWTException, TokenExpiredException, 
+                            TokenInvalidException, InvalidClaimException,
+                            PayloadException, TokenBlacklistedException, UserNotDefinedException};
 
 class Handler extends ExceptionHandler
 {
@@ -48,6 +54,26 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
+        switch($exception)
+        {
+            case($exception instanceof UnauthorizedHttpException):
+            {
+                return response()->webApi(['error' => 'token_not_provided'], $exception->getStatusCode());
+            }
+            case($exception instanceof TokenExpiredException):
+            {
+                return response()->webApi(['error' => 'token_expired'], $exception->getStatusCode());
+            }
+            case($exception instanceof TokenInvalidException):
+            {
+                return response()->webApi(['error' => 'token_invalid'], $exception->getStatusCode());
+            }
+            case($exception instanceof AuthenticationException):
+            {
+                return response()->webApi(['error' => 'not_authenticated'], 404);
+            }
+        }
+
         return parent::render($request, $exception);
     }
 }
