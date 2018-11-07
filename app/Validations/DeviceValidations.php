@@ -6,7 +6,8 @@ abstract class DeviceValidations
 {
   const paramsByFunction = [
     'registerDevice' => ['user_name', 'device_id', 'name', 'type', 'operating_system', 'os_version', 'number_of_sensors', 'sensors'],
-    'deleteDevice' => ['device_id']
+    'deleteDevice' => ['device_id'],
+    'getDeviceSensors' => ['device_id']
   ];
 
   const rulesByFunction = [
@@ -27,6 +28,9 @@ abstract class DeviceValidations
       'sensors.*.sensor_readings.*.rendering_type' => 'required|string|max:255'
     ],
     'deleteDevice' => [
+      'device_id' => 'required|string|min:40|max:40'
+    ],
+    'getDeviceSensors' => [
       'device_id' => 'required|string|min:40|max:40'
     ]
   ];

@@ -11,14 +11,32 @@ class DeviceController extends Controller
 {
   
   /**
-   * Get all Devices, together with Sensors and SensorReadings
+   * Get all Devices
    * 
    * @param Request
    * @return \Illuminate\Http\JsonResponse
    */
-  public function getDevices(Request $request)
+  public function getDevices()
   {
-    return Device::with('sensors.sensorReadings')->get();
+    return Device::all();
+  }
+
+  /**
+   * Get Device by device_id, together with Sensors and SensorReadings
+   * 
+   * @param Request
+   * @return \Illuminate\Http\JsonResponse
+   */
+  public function getDeviceSensors(String $device_id)
+  {
+    $params = ['device_id' => $device_id];
+    $validateStatus = $this->_validateUserParams($params, DeviceValidations::rulesByFunction[__FUNCTION__]);
+    if(true !== $validateStatus)
+    {
+      return response()->webApi(['error' => $validateStatus], 401);
+    }
+
+    return Device::where('device_id', $device_id)->with('sensors.sensorReadings')->get();
   }
 
   /**

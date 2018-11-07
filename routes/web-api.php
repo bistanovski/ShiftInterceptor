@@ -37,6 +37,9 @@ Route::group(['prefix' => 'v1'], function () {
     
     //Get all Devices
     Route::get('devices', 'DeviceController@getDevices');
+    
+    //Get Device's sensors
+    Route::get('sensors/{device_id}', 'DeviceController@getDeviceSensors');
 
     //Register Device
     Route::post('device/register', 'DeviceController@registerDevice');
