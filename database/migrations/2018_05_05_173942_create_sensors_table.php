@@ -17,6 +17,7 @@ class CreateSensorsTable extends Migration
             $table->bigIncrements('id');
             $table->string('sensor_name', 255);
             $table->char('device_id', 40);
+            $table->integer('number_of_readings');
             $table->timestamps(); //created_at and updated_at columns
 
             $table->foreign('device_id')->references('device_id')->on('Devices')

@@ -67,6 +67,11 @@ class UserController extends Controller
   public function createUser(Request $request)
   {
     $params = $request->only(UserValidations::paramsByFunction[__FUNCTION__]);
+    if(User::existsWithUsername($params['username']) || User::existsWithEmail($params['email']))
+    {
+      return response()->webApi(['User already registered!'], 200);
+    }
+
         
     $validateStatus = $this->_validateUserParams($params, UserValidations::rulesByFunction[__FUNCTION__]);
     if(true !== $validateStatus)

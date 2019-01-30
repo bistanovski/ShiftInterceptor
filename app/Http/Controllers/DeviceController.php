@@ -48,6 +48,10 @@ class DeviceController extends Controller
   public function registerDevice(Request $request)
   {
     $params = $request->only(DeviceValidations::paramsByFunction[__FUNCTION__]);
+    if(Device::existsWithDeviceID($params['device_id']))
+    {
+      return response()->webApi(['Device already registered!'], 200);
+    }
     
     $validateStatus = $this->_validateUserParams($params, DeviceValidations::rulesByFunction[__FUNCTION__]);
     if(true !== $validateStatus)
